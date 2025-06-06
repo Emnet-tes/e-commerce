@@ -74,10 +74,10 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <main>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 pt-20">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading product...</p>
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
       </main>
@@ -96,87 +96,96 @@ export default function ProductDetail() {
     );
   }
 
-return (
-  <main className="bg-slate-200 min-h-screen py-8">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md">
-        {/* Product Image */}
-        <div className="relative h-96 w-full bg-white rounded-lg">
-          <Image
-            src={product.image}
-            alt={product.title}
-            fill
-            className="object-contain p-4"
-          />
-        </div>
-
-        {/* Product Info */}
-        <div className="flex flex-col justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {product.title}
-            </h1>
-            <div className="flex items-center mb-4">
-              <span className="text-yellow-400 text-lg">★</span>
-              <span className="text-gray-600 ml-2 text-sm">
-                {product.rating.rate} ({product.rating.count} reviews)
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 mb-4">
-              ${product.price}
-            </p>
-            <p className="text-gray-700 mb-6 text-sm">{product.description}</p>
-
-            {/* Quantity Selector */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Quantity
-              </label>
-              <div className="flex items-center">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-1 border border-gray-300 rounded-l-md bg-white"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) =>
-                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                  }
-                  className="w-16 text-center border-t border-b border-gray-300 py-1"
-                />
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-1 border border-gray-300 rounded-r-md bg-white"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+  return (
+    <main className="bg-slate-200 min-h-screen py-8  pt-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md">
+          {/* Product Image */}
+          <div className="relative h-96 w-full bg-white rounded-lg">
+            <Image
+              src={product.image}
+              alt={product.title}
+              fill
+              className="object-contain p-4"
+            />
           </div>
 
-          <div>
-            {/* Add to Cart Button */}
-            <button
-              onClick={() => handleAddToCart(product)}
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors mb-4"
-            >
-              Add to Cart
-            </button>
-
-            {/* Category */}
+          {/* Product Info */}
+          <div className="flex flex-col justify-between">
             <div>
-              <h2 className="text-sm font-medium text-gray-700">Category</h2>
-              <p className="text-gray-900 capitalize">{product.category}</p>
+              {/* Title and Category */}
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {product.title}
+              </h1>
+              <div className="flex gap-4">
+                {/* Rating */}
+                <div className="flex items-center mb-4">
+                  <span className="text-yellow-400 text-lg">★</span>
+                  <span className="text-gray-600 ml-2 text-sm">
+                    {product.rating.rate} ({product.rating.count} reviews)
+                  </span>
+                </div>
+                <div className="rounded-full border-blue-600 bg-blue-50 text-sm w-fit px-4 py-1 mb-4 border capitalize text-gray-800">
+                  {product.category}
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-700 mb-6 text-sm">
+                {product.description}
+              </p>
+
+             
+                {/* Quantity Selector */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Quantity
+                  </label>
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-1 border border-gray-300 rounded-l-md bg-white text-black"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) =>
+                        setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-10 text-center border-t border-b border-gray-300 py-1 text-black"
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-1 border border-gray-300 rounded-r-md bg-white text-black"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                {/* Price */}
+                <p className="text-2xl font-bold text-gray-900 mb-4">
+                  ${product.price}
+                </p>
+           
+            </div>
+
+            <div>
+              {/* Add to Cart Button */}
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="w-full bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Add to Cart
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
-);
+    </main>
+  );
+  
 
 }

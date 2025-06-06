@@ -30,7 +30,7 @@ export default function SignUp() {
     try {
       await createUserWithEmailAndPassword(auth, formData.email, formData.password);
 
-      console.log("Signup attempt with:", formData);
+    
       router.push("/auth/login"); 
     } catch (err) {
       setError("Failed to create account. Please try again.");

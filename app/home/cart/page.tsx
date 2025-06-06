@@ -27,22 +27,12 @@ export default function Cart() {
         try {
           // Fetch ALL cart data
           const data = await getDocs(cartsCollection);
-          console.log(
-            "Fetched cart data:",
-            data.docs.map((doc) => doc.data())
-          );
           // Filter by userId if needed
           const filteredData = data.docs.filter(
             (doc) => doc.data().userId.replace(/"/g, "") === userId
           );
-
-          console.log(
-            "Filtered cart data for user:",
-            userId,
-            filteredData.map((doc) => doc.data())
-          );
           if (filteredData.length === 0) {
-            console.warn("No cart items found for user:", userId);
+            // console.warn("No cart items found for user:", userId);
             setLoading(false);
             return;
           }
@@ -69,7 +59,10 @@ export default function Cart() {
 
       fetchCartAndProducts();
     }
-    setLoading(false);
+    else{
+    
+        setLoading(false); 
+    }
   }, [items.length, userId]);
 
 
@@ -107,10 +100,10 @@ export default function Cart() {
   if (loading) {
     return (
       <main className="bg-gray-100 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading cart...</p>
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
           </div>
         </div>
       </main>
@@ -119,7 +112,7 @@ export default function Cart() {
 
   return (
     <main className="bg-gray-100 min-h-screen ">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <h1 className="text-3xl font-bold text-gray-900 pt-20">
           Shopping Cart
         </h1>

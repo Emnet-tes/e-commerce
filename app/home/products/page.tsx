@@ -8,10 +8,10 @@ export default function ProductsPage() {
     <Suspense
       fallback={
         <main className="bg-gray-100 min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading products...</p>
+          <div className="min-h-screen flex items-center justify-center bg-white pt-20">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+              <p className="mt-4 text-gray-600">Loading...</p>
             </div>
           </div>
         </main>
