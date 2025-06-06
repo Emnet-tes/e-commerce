@@ -1,55 +1,103 @@
 "use client";
 
-import { Trash2 } from 'lucide-react';
+import { db } from "@/firebase/clientApp";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+import { Trash2 } from "lucide-react";
 import Image from "next/image";
-import Link from 'next/link';
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import toast from 'react-hot-toast';
-import { removeFromCart, updateQuantity } from '../store/cartSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-
-
+import toast from "react-hot-toast";
+import { removeFromCart, setCart} from "../../store/cartSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 export default function Cart() {
   const dispatch = useAppDispatch();
   const { items, total } = useAppSelector((state) => state.cart);
   const [loading, setLoading] = useState(true);
+  const userId = useAppSelector((state) => state.user.userId);
 
+  const cartsCollection = collection(db, "carts");
   useEffect(() => {
-    const fetchCartAndProducts = async () => {
-      try {
-        // Fetch ALL cart data 
-        const cartResponse = await fetch("https://fakestoreapi.com/carts"); 
-        const cartData = await cartResponse.json();
-        console.log("Cart Data:", cartData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (items.length === 0) {
+      const fetchCartAndProducts = async () => {
+        try {
+          // Fetch ALL cart data
+          const data = await getDocs(cartsCollection);
+          console.log(
+            "Fetched cart data:",
+            data.docs.map((doc) => doc.data())
+          );
+          // Filter by userId if needed
+          const filteredData = data.docs.filter(
+            (doc) => doc.data().userId.replace(/"/g, "") === userId
+          );
 
-    fetchCartAndProducts();
-  }, []);
+          console.log(
+            "Filtered cart data for user:",
+            userId,
+            filteredData.map((doc) => doc.data())
+          );
+          if (filteredData.length === 0) {
+            console.warn("No cart items found for user:", userId);
+            setLoading(false);
+            return;
+          }
 
-  const handleUpdateQuantity = (productId: number, quantity: number) => {
-    if (quantity < 1) return;
-    dispatch(updateQuantity({ productId, quantity }));
-    toast.success('Cart updated!', {
-      duration: 1500,
-      position: 'top-right',
-    });
-  };
+          dispatch(
+            setCart(
+              filteredData.map((doc) => {
+                const docData = doc.data();
+                return {
+                  id: doc.id,
+                  product: docData.product,
+                  quantity: docData.quantity,
+                  date: docData.date.toDate().toISOString(),
+                };
+              })
+            )
+          );
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  const handleRemoveItem = (productId: number) => {
-    dispatch(removeFromCart(productId));
-    toast.success('Item removed from cart!', {
-      duration: 1500,
-      position: 'top-right',
-      style: {
-        background: '#f44336',
-        color: '#fff',
-      },
-    });
+      fetchCartAndProducts();
+    }
+    setLoading(false);
+  }, [items.length, userId]);
+
+
+  const handleRemoveItem = async (id: string) => {
+    try {
+      const cartDoc = doc(db, "carts", id);
+      await deleteDoc(cartDoc);
+
+      toast.success("Item removed from cart!", {
+        duration: 1500,
+        position: "top-right",
+        style: {
+          background: "#f44336",
+          color: "#fff",
+        },
+      });
+      dispatch(removeFromCart(id));
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item from cart. Please try again.", {
+        duration: 2000,
+        position: "top-right",
+        style: {
+          background: "#f44336",
+          color: "#fff",
+        },
+      });
+    }
   };
 
   const shipping = 10;
@@ -59,7 +107,7 @@ export default function Cart() {
   if (loading) {
     return (
       <main className="bg-gray-100 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading cart...</p>
@@ -72,7 +120,9 @@ export default function Cart() {
   return (
     <main className="bg-gray-100 min-h-screen ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 pt-20">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-gray-900 pt-20">
+          Shopping Cart
+        </h1>
 
         {items.length === 0 ? (
           <div className="text-center py-12">
@@ -97,7 +147,7 @@ export default function Cart() {
                 <ul className=" gap-2 md:gap-4 flex flex-col">
                   {items.map((item) => (
                     <li
-                      key={item.product.id}
+                      key={item.id}
                       className="p-6 bg-white rounded-lg shadow-md overflow-hidden"
                     >
                       <div className="flex items-center">
@@ -116,35 +166,15 @@ export default function Cart() {
                           <p className="text-gray-600">${item.product.price}</p>
                           <div className="mt-4 flex items-center">
                             <div className="flex items-center border border-gray-300 rounded-md">
-                              <button
-                                onClick={() =>
-                                  handleUpdateQuantity(
-                                    item.product.id,
-                                    item.quantity - 1
-                                  )
-                                }
-                                className="px-3 py-1 text-gray-600 hover:text-gray-700"
-                              >
-                                -
-                              </button>
+                         
                               <span className="px-3 py-1 text-gray-900">
                                 {item.quantity}
                               </span>
-                              <button
-                                onClick={() =>
-                                  handleUpdateQuantity(
-                                    item.product.id,
-                                    item.quantity + 1
-                                  )
-                                }
-                                className="px-3 py-1 text-gray-600 hover:text-gray-700"
-                              >
-                                +
-                              </button>
+                           
                             </div>
                             <button
-                              onClick={() => handleRemoveItem(item.product.id)}
-                              className="ml-4 text-red-600 hover:text-red-700"
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="ml-4 text-red-600 hover:text-red-700 cursor-pointer"
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>

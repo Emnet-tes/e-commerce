@@ -2,31 +2,27 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import ProductCard from "../components/ProductCard";
-import { Product } from "../types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchProducts } from "../store/productSlice";
+import ProductCard from "./ProductCard";
 
 export default function ProductsContent() {
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
+  const dispatch = useAppDispatch();
+  const {
+    items: products,
+    loading,
+    error,
+  } = useAppSelector((state) => state.products);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
 
+  // Fetch products only once when component mounts
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("https://fakestoreapi.com/products");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    if (products.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products.length]);
 
   // Handle category from URL
   useEffect(() => {
@@ -61,6 +57,10 @@ export default function ProductsContent() {
         </div>
       </main>
     );
+  }
+
+  if (error) {
+    return <div className="text-center text-red-600 py-8">Error: {error}</div>;
   }
 
   return (

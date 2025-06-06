@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
-import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
 import Providers from "./components/Providers";
 import "./globals.css";
 
@@ -32,9 +30,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen flex flex-col">
         <Providers>
-          <Navbar />
           <main className="flex-grow">{children}</main>
-          <Footer />
           <Toaster position="top-right" />
         </Providers>
       </body>

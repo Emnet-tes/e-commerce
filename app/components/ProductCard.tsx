@@ -1,5 +1,7 @@
 "use client";
 
+import { db } from "@/firebase/clientApp";
+import { addDoc, collection } from "firebase/firestore";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,22 +16,47 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const cartsCollection = collection(db, "carts");
+  const handleAddToCart = async () => {
+    try {
+      const userId = localStorage.getItem("user")?.replace(/"/g, "");
+      const result = await addDoc(cartsCollection, {
+        date: new Date(),
+        userId: userId,
+        product: {
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          image: product.image,
+        },
+        quantity: 1,
+      });
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({ product, quantity: 1 }));
-    toast.success(`${product.title} added to cart!`, {
-      duration: 2000,
-      position: "top-right",
-      style: {
-        background: "#4CAF50",
-        color: "#fff",
-      },
-    });
+      dispatch(addToCart({ product, quantity: 1, id: result.id }));
+      toast.success(`${product.title} added to cart!`, {
+        duration: 2000,
+        position: "top-right",
+        style: {
+          background: "#4CAF50",
+          color: "#fff",
+        },
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add to cart. Please try again.", {
+        duration: 2000,
+        position: "top-right",
+        style: {
+          background: "#f44336",
+          color: "#fff",
+        },
+      });
+    }
   };
 
   return (
     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-blue-500 overflow-hidden transition-shadow  duration-300 hover:shadow-xl hover:-translate-y-2">
-      <Link href={`/products/${product.id}`}>
+      <Link href={`/home/products/${product.id}`}>
         <div className="relative h-48 w-full overflow-hidden">
           <Image
             src={product.image}
@@ -73,13 +100,3 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
-
-
-
-
-
-
-
-
-
-
