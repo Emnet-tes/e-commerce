@@ -67,7 +67,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </Link>
       <div className="p-4">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/home/products/${product.id}`}>
           <h3 className="text-lg font-semibold text-gray-800 mb-2 hover:text-blue-600 transition-colors">
             {product.title}
           </h3>
